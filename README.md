@@ -39,19 +39,42 @@ Medical files are stored off-chain using IPFS, while consent logic, access verif
 ## 🛠️ Tech Stack
 
 ### Frontend
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/2ffa59bb-52e2-4ef5-bcbd-2d865b4aeb0e" width="45" />
+  
+  <img src="https://github.com/user-attachments/assets/5b669a24-1b16-426d-b12b-e3b7fa399110" width="45" />
+  
+  <img src="https://github.com/user-attachments/assets/25835cbd-013c-4b79-9583-17a1b94c8288" width="45" />
+</p>
+
 - React / Next.js  
-- MetaMask (wallet-based authentication)  
+- MetaMask  
 - QR Code Generator & Scanner  
 
 ### Blockchain
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/02028d10-c842-4b62-b1bc-74c8442d18a4" width="45" />
+  
+  <img src="https://github.com/user-attachments/assets/e549c3b3-1662-4e10-8f34-644ba9d46ef2" width="45" />
+</p>
+
 - Ethereum / Polygon Testnet  
-- Solidity (Smart Contracts)  
+- Solidity  
 - Hardhat / Remix  
 
+
 ### Storage
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/ae6c17ac-174a-46b6-82e1-ed03b8ff0ede" width="45" />
+</p>
+
 - IPFS (InterPlanetary File System)  
 
 ### Backend & Utilities
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/5e8d636b-ae0e-4dbd-88a8-61afa03c38aa" width="45" />
+</p>
+
 - Node.js  
 - Ethers.js / Web3.js  
 
@@ -137,6 +160,11 @@ The Health Passport is a **QR-based digital identifier** that enables seamless d
 8. Access is logged immutably  
 
 Emergency access bypasses consent **but is permanently flagged and auditable**.
+The following diagram illustrates the end-to-end flow of data access and consent enforcement:
+
+
+<img width="180" height="385" alt="0" src="https://github.com/user-attachments/assets/d69e2884-51be-42ed-99e8-9b831a6c1803" />
+
 
 ---
 
