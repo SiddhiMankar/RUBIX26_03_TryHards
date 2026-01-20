@@ -56,7 +56,33 @@ contract HealthRecord {
         emit AccessRevoked(msg.sender, _doctor);
     }
 
-    function getRecords(address _patient) public view onlyAuthorized(_patient) returns (Record[] memory) {
+    event EmergencyAccessAccessed(address indexed doctor, address indexed patient, uint256 timestamp);
+
+    function emergencyAccess(address _patient) public {
+        // In a real system, we might require the caller to be a verified doctor via a registry.
+        // Here, we allow it but log a CRITICAL event that cannot be deleted.
+        emit EmergencyAccessAccessed(msg.sender, _patient, block.timestamp);
+    }
+
+    function getRecords(address _patient) public view returns (Record[] memory) {
+         // Modified: We don't use the modifier here because we need to handle "Emergency" logic 
+         // on the frontend or backend. Or, simpler:
+         // The standard 'getRecords' stays strict.
+         // 'emergencyGetRecords' allows access but logs it.
+         
+         require(
+            msg.sender == _patient || authorizedDoctors[_patient][msg.sender],
+            "Not authorized"
+        );
+        return patientRecords[_patient];
+    }
+    
+    // Explicit Emergency Function
+    function getRecordsEmergency(address _patient) public returns (Record[] memory) {
+        // 1. Emit the critical log (this costs gas and is permanent)
+        emit EmergencyAccessAccessed(msg.sender, _patient, block.timestamp);
+        
+        // 2. Return records (Bypassing the 'require' check of authorizedDoctors)
         return patientRecords[_patient];
     }
 }

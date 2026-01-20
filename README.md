@@ -226,6 +226,12 @@ The following diagram illustrates the end-to-end flow of data access and consent
 
 - Clear, interpretable access timelines  
 
+### 6️⃣ Modern "Glassmorphism" UI
+
+- **Doctor's "Red Zone"**: High-stakes interface for Emergency actions.
+- **Digital Health Passport**: Holographic ID card with verified identity hash.
+- **Responsive Design**: Professional grade aesthetics using Tailwind CSS.
+
 ---
 
 <a id="screenshots"></a>

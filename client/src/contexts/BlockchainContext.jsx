@@ -81,6 +81,23 @@ export const BlockchainProvider = ({ children }) => {
         if (accounts.length > 0) {
           connectWallet();
         }
+
+        // Listen for account changes
+        window.ethereum.on('accountsChanged', (accounts) => {
+           if (accounts.length > 0) {
+              setAccount(accounts[0]);
+              // Ideally re-connect everything, but a simple reload ensures clean state
+              window.location.reload(); 
+           } else {
+              setAccount(null);
+              setUserProfile(null);
+           }
+        });
+
+        // Listen for chain changes
+        window.ethereum.on('chainChanged', () => {
+           window.location.reload();
+        });
       }
       setIsLoading(false);
     };
@@ -95,7 +112,11 @@ export const BlockchainProvider = ({ children }) => {
       consentContract, 
       userProfile,     // Expose profile to app
       createUserProfile, // Expose update function
-      isLoading 
+      isLoading,
+      disconnectWallet: () => {
+        setAccount(null);
+        setUserProfile(null);
+      }
     }}>
       {children}
     </BlockchainContext.Provider>
