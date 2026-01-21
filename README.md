@@ -14,6 +14,7 @@ A decentralized health data exchange system that gives patients **true ownership
 
 - [Brief Description](#brief-description)
 - [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
 - [Key Terminologies](#key-terminologies)
 - [Problems with Traditional Systems](#problems-with-traditional-systems)
 - [How Our System Improves Healthcare Data Exchange](#system-improvements)
@@ -93,6 +94,55 @@ Medical files are stored off-chain using IPFS, while consent logic, access verif
 ### 🧪 Testing Stack
 
 - **Mocha + Chai** (Included with Hardhat)
+
+---
+
+<a id="system-architecture"></a>
+
+## 🏗️ System Architecture
+
+The **Consent-as-Code Health Passport** uses a **Hybrid Decentralized Architecture**. It combines the security and immutability of blockchain with the speed and usability of traditional web servers.
+
+```mermaid
+graph TD
+    %% Styling
+    classDef client fill:#e0f2fe,stroke:#0ea5e9,stroke-width:2px;
+    classDef server fill:#f0fdf4,stroke:#22c55e,stroke-width:2px;
+    classDef chain fill:#fffbeb,stroke:#f59e0b,stroke-width:2px;
+    classDef storage fill:#f3e8ff,stroke:#a855f7,stroke-width:2px;
+
+    subgraph ClientLayer [User Interaction Layer]
+        UI([React + Vite Frontend\nPort: 5173]):::client
+        Wallet([MetaMask Wallet]):::client
+    end
+
+    subgraph ServiceLayer [Off-Chain Service Layer]
+        API[Express.js API\nPort: 5000]:::server
+        DB[(MongoDB\nUser Profiles)]:::server
+    end
+
+    subgraph BlockchainLayer [Trust & Logic Layer]
+        Node[Hardhat Local Node\nPort: 8545]:::chain
+        Contract1[HealthRecord.sol\n(Registry & Events)]:::chain
+        Contract2[Consent.sol\n(Logic Wrapper)]:::chain
+    end
+
+    subgraph StorageLayer [Data Storage Layer]
+        IPFS[Pinata IPFS\n(Decentralized File Storage)]:::storage
+    end
+
+    %% Flows
+    UI <-->|Sign Tx / Auth| Wallet
+    UI <-->|Fetch Profiles / Metadata| API
+    API <-->|Store User Data| DB
+    
+    UI <-->|Read/Write Smart Contracts| Node
+    Node --> Contract1
+    Node --> Contract2
+    
+    UI <-->|Upload & Retrieve Encrypted Files| IPFS
+    Contract1 -.->|Stores IPFS Hash| IPFS
+```
 
 ---
 
@@ -178,19 +228,68 @@ The Health Passport is a **QR-based digital identifier** that enables seamless d
 
 ## ⚙️ System Workflow
 
-1. Patient/Hospitals uploads an encrypted medical record  
-2. File is stored on IPFS  
-3. IPFS hash and metadata are stored on-chain  
-4. Patient grants consent by providing Government verified identity of the doctor
-5. Doctor requests access  
-6. Smart contract validates consent  
-7. File is retrieved and decrypted  
-8. Access is logged immutably  
+### 1. Uploading a Health Record (Patient)
 
-Emergency access bypasses consent **but is permanently flagged and auditable**.
-The following diagram illustrates the end-to-end flow of data access and consent enforcement:
+This flow shows how a patient uploads a file. The file itself goes to IPFS, while the *metadata and link* go to the Blockchain.
 
-<img width="400" height="800" alt="0" src="https://github.com/user-attachments/assets/d69e2884-51be-42ed-99e8-9b831a6c1803" />
+```mermaid
+sequenceDiagram
+    participant P as Patient (Frontend)
+    participant IPFS as Pinata IPFS
+    participant BC as Blockchain (HealthRecord.sol)
+    participant DB as Backend API
+
+    P->>P: Select File (PDF/X-Ray)
+    P->>IPFS: Upload File (Encrypted)
+    activate IPFS
+    IPFS-->>P: Return CID (IPFS Hash)
+    deactivate IPFS
+    
+    P->>P: Sign Transaction (addRecord)
+    P->>BC: addRecord(CID, "X-Ray", "Broken Arm")
+    activate BC
+    BC-->>BC: Store mapping: Patient -> [Record]
+    BC-->>BC: Emit RecordAdded Event
+    BC-->>P: Transaction Confirmed
+    deactivate BC
+
+    P->>DB: (Optional) Update Activity Log
+```
+
+### 2. Accessing a Record (Doctor)
+
+This flow illustrates the security check. The data is only revealed *after* the smart contract verifies consent.
+
+```mermaid
+sequenceDiagram
+    participant D as Doctor (Frontend)
+    participant BC as Blockchain (HealthRecord.sol)
+    participant IPFS as Pinata IPFS
+
+    D->>D: Enter Patient Address
+    D->>BC: getRecords(PatientAddress)
+    activate BC
+    
+    note right of BC: Smart Contract Verification
+    alt Is Authorized?
+        BC-->>BC: Check authorizedDoctors[Patient][Doctor]
+    else Emergency?
+        BC-->>BC: Check Emergency Access Logic
+    end
+    
+    alt If Allowed
+        BC-->>D: Return List of generic Records [CIDs, Metadata]
+    else If Denied
+        BC--x D: Revert: "Not authorized"
+    end
+    deactivate BC
+
+    D->>IPFS: Request File by CID
+    activate IPFS
+    IPFS-->>D: Stream File Content
+    deactivate IPFS
+    D->>D: Decrypt & Display Record
+```
 
 ---
 
