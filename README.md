@@ -112,23 +112,23 @@ graph TD
     classDef storage fill:#f3e8ff,stroke:#a855f7,stroke-width:2px;
 
     subgraph ClientLayer [User Interaction Layer]
-        UI([React + Vite Frontend\nPort: 5173]):::client
+        UI(["React + Vite Frontend\nPort: 5173"]):::client
         Wallet([MetaMask Wallet]):::client
     end
 
     subgraph ServiceLayer [Off-Chain Service Layer]
-        API[Express.js API\nPort: 5000]:::server
-        DB[(MongoDB\nUser Profiles)]:::server
+        API["Express.js API\nPort: 5000"]:::server
+        DB[("MongoDB\nUser Profiles")]:::server
     end
 
     subgraph BlockchainLayer [Trust & Logic Layer]
-        Node[Hardhat Local Node\nPort: 8545]:::chain
-        Contract1[HealthRecord.sol\n(Registry & Events)]:::chain
-        Contract2[Consent.sol\n(Logic Wrapper)]:::chain
+        Node["Hardhat Local Node\nPort: 8545"]:::chain
+        Contract1["HealthRecord.sol\n(Registry & Events)"]:::chain
+        Contract2["Consent.sol\n(Logic Wrapper)"]:::chain
     end
 
     subgraph StorageLayer [Data Storage Layer]
-        IPFS[Pinata IPFS\n(Decentralized File Storage)]:::storage
+        IPFS["Pinata IPFS\n(Decentralized File Storage)"]:::storage
     end
 
     %% Flows
