@@ -57,6 +57,12 @@ export const BlockchainProvider = ({ children }) => {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const currentAccount = accounts[0];
       setAccount(currentAccount);
+
+      // Check Network
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId !== '0x7a69') { // 31337
+          alert("WRONG NETWORK DETECTED! ⚠️\n\nPlease switch MetaMask to 'Localhost 8545'.\n\nCurrently on: " + chainId);
+      }
       
       // Fetch Profile from MongoDB
       await fetchUserProfile(currentAccount);

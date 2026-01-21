@@ -32,7 +32,7 @@ const DoctorDashboard = () => {
             if (err.message.includes("Not authorized") || err.message.includes("revert")) {
                  setError("ACCESS DENIED: You do not have consent to view this patient's records.");
             } else {
-                 setError("Failed to fetch records. Verify address and consent.");
+                 setError(`Failed to fetch records. Debug: ${err.message}`);
             }
         } finally {
             setIsLoading(false);
@@ -43,52 +43,22 @@ const DoctorDashboard = () => {
         if (!healthRecordContract || !patientAddress) return;
         setIsLoading(true);
         try {
-            // Call the NEW emergency function
-            // Note: This requires a transaction (write), not just a call (read), because it emits an event!
+
+            // 1. Force the Logging Transaction FIRST (Audit Trail is mandatory)
+            console.log("Initiating Emergency Log Transaction...");
             const tx = await healthRecordContract.getRecordsEmergency(patientAddress);
-            // Wait for transaction to be mined? 
-            // Actually getRecordsEmergency returns data, but in Solidity 'write' functions don't return data to the frontend easily.
-            // We usually have to wait for the tx, and then fetch again?
-            // Wait, if I defined it as a write function, I can't get the return value directly in ethers v6 unless I use staticCall.
+            console.log("Transaction Sent:", tx.hash);
             
-            // 1. Send the "I am accessing this in emergency" Transaction
-            const receipt = await tx.wait(); // Wait for block
-            
-            // 2. Now that the event is emitted, we can try to fetch?
-            // Actually, getRecordsEmergency returns the records.
-            // PRO TIP: Use .staticCall to get the data, then .send to log it?
-            // Or just trust the return?
-            // Ethers: calling a non-view function returns a TransactionResponse.
-            
-            // Hack for Hackathon:
-            // 1. Emit the log (Audit Trail)
-            await tx.wait(); 
-            
-            // 2. Then fetch the data using specific "view" override if possible?
-            // No, the contract function `getRecordsEmergency` is effective only if it returns data.
-            // BUT standard JSON-RPC doesn't give return values for Transactions.
-            // FIX: We need a View function that allows emergency access? No that defeats the logging purpose.
-            
-            // REAL FIX:
-            // We call `emergencyAccess(address)` -> logs it.
-            // Then we call `getRecords(address)`? No that still reverts.
-            // Ah, I need a 'view' function that is open? No.
-            // 
-            // Let's rely on the `getRecords` with a "force" param? 
-            // In the contract I added `getRecordsEmergency` which returns `Record[]`.
-            // Use staticCall to get the data (off-chain simulation), 
-            // AND send the transaction to log it on-chain (accountability).
-            
-            // Step A: "Simulate" to get data (READ)
+            // 2. Wait for it to be mined (Validation)
+            await tx.wait();
+            console.log("Transaction Mined. Fetching data...");
+
+            // 3. Now fetch the data (using staticCall to simulate the return value)
             const data = await healthRecordContract.getRecordsEmergency.staticCall(patientAddress);
-            
-            // Step B: "Execute" to log it (WRITE) - Fire and forget (or wait)
-            await healthRecordContract.getRecordsEmergency(patientAddress);
             
             setRecords(data);
             setError('');
-            // Show Alert
-            alert("⚠️ EMERGENCY ACCESS LOGGED ON BLOCKCHAIN ⚠️");
+            alert("⚠️ EMERGENCY ACCESS LOGGED ON BLOCKCHAIN ⚠️\n\nTransaction Hash: " + tx.hash);
             
         } catch (err) {
             console.error("Emergency Access Failed:", err);
