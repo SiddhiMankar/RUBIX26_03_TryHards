@@ -238,6 +238,34 @@ The following diagram illustrates the end-to-end flow of data access and consent
 
 ## 🖼️ Screenshots
 
-> *Screenshots will be added after final UI integration.*
+### 1. Patient Dashboard & Record Upload
+
+![Patient Dashboard - Upload Success](./Screenshot/patient_successfull%20record%20upload.png)
+*Patients can easily upload medical records (X-Rays, Lab Reports) which are encrypted and stored on IPFS.*
+
+### 2. Access Control (Consent Management)
+
+![Patient Consent Management](./Screenshot/Accesscontrolbypatient.png)
+*Patients have granular control to grant or revoke access to specific doctors using their wallet address.*
+
+### 3. Doctor Dashboard - Access Denied (Default State)
+
+![Doctor Dashboard - No Access](./Screenshot/Doctor_dashboard_before_Grantaccess.png)
+*By default, doctors cannot view any patient records without explicit consent.*
+
+### 4. Doctor Dashboard - Access Granted
+
+![Doctor Dashboard - View Records](./Screenshot/Doctors_dashboard_after_grantaccess.pndg.png)
+*Once access is granted, the doctor can view and retrieve the patient's medical history.*
+
+### 5. Emergency Access Override
+
+![Emergency Access Action](./Screenshot/On%20emergency%20access.png)
+*In critical situations, doctors can trigger an "Emergency Access" override.*
+
+### 6. Emergency Audit Logs (Accountability)
+
+![Emergency Audit Trail](./Screenshot/forced%20access%20logs.png)
+*Every emergency override is permanently logged on the blockchain and visible to the patient as a "Mandatory Reporting" event.*
 
 ---

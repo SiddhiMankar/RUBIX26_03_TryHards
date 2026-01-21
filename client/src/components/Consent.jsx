@@ -23,7 +23,7 @@ const Consent = () => {
                  const revokeFilter = healthRecordContract.filters.AccessRevoked(account, null);
                  
                  // 2. Emergency Access (Audit Trail)
-                 const emergencyFilter = healthRecordContract.filters.EmergencyAccessAccessed(account, null);
+                 const emergencyFilter = healthRecordContract.filters.EmergencyAccessAccessed(null, account);
                  
                  const [grantEvents, revokeEvents, emergencyEvents] = await Promise.all([
                      healthRecordContract.queryFilter(grantFilter),
@@ -59,7 +59,7 @@ const Consent = () => {
                  const logs = await Promise.all(emergencyEvents.map(async (event) => {
                      const block = await event.getBlock();
                      return {
-                         doctor: event.args[1],
+                         doctor: event.args[0],
                          timestamp: new Date(Number(event.args[2]) * 1000).toLocaleString(), // Use event timestamp
                          blockTimestamp: new Date(block.timestamp * 1000).toLocaleString(), // Fallback/Verify
                          txHash: event.transactionHash
@@ -91,7 +91,7 @@ const Consent = () => {
                 setAuthorizedList(prev => prev.filter(d => d !== doctor));
             }
         };
-        const onEmergency = (patient, doctor, timestamp) => {
+        const onEmergency = (doctor, patient, timestamp) => {
             if (patient.toLowerCase() === account.toLowerCase()) {
                 setEmergencyLogs(prev => [{
                     doctor,
