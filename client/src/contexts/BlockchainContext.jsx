@@ -60,8 +60,21 @@ export const BlockchainProvider = ({ children }) => {
 
       // Check Network
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      console.log("DEBUG: Detected Chain ID:", chainId);
+      
       if (chainId !== '0x7a69') { // 31337
-          alert("WRONG NETWORK DETECTED! ⚠️\n\nPlease switch MetaMask to 'Localhost 8545'.\n\nCurrently on: " + chainId);
+          alert(`WRONG NETWORK DETECTED! ⚠️\n\nExpected: Localhost (31337)\nDetected: ${chainId}\n\nPlease switch MetaMask to 'Localhost 8545'.`);
+      }
+
+      // Check Balance
+      const balance = await window.ethereum.request({ 
+          method: 'eth_getBalance', 
+          params: [currentAccount, 'latest'] 
+      });
+      console.log(`DEBUG: Account ${currentAccount} has balance: ${ethers.formatEther(balance)} ETH`);
+      
+      if (ethers.formatEther(balance) === "0.0") {
+          alert(`⚠️ ZERO ETH DETECTED!\n\nAccount: ${currentAccount}\n\n1. Did you import the correct private key?\n2. Are you connected to Localhost 8545?\n\nCheck the console for more info.`);
       }
       
       // Fetch Profile from MongoDB

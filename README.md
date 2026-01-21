@@ -21,7 +21,7 @@ A decentralized health data exchange system that gives patients **true ownership
 - [System Workflow](#system-workflow)
 - [Key Features](#key-features)
 - [Screenshots](#screenshots)
-- [Developer Guide (Setup)](#developer-guide)
+- [Developer Guide (Setup)](./setup.md)
 
 ---
 
